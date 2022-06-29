@@ -1,10 +1,11 @@
 class Queue {
+    items: any[];
     constructor() {
         this.items = [];
     }
     
     // add element to the queue
-    enqueue(element) {
+    enqueue(element:object) {
         return this.items.push(element);
     }
     

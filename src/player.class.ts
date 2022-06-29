@@ -1,5 +1,13 @@
 class Player{
-    constructor(username, socketid){
+    upPressed: boolean;
+    downPressed: boolean;
+    leftPressed: boolean;
+    rightPressed: boolean;
+    x: number;
+    y: number;
+    username: string;
+    socketid: string;
+    constructor(username:string, socketid:string){
         this.upPressed = false;
         this.downPressed = false;
         this.leftPressed = false;
@@ -9,13 +17,7 @@ class Player{
         this.username = username
         this.socketid = socketid
     }
-    move() {
-		
-		this.x_vel = (this.right_pressed - this.left_pressed);
-		this.y_vel = (this.down_pressed - this.up_pressed);
-		this.x += this.x_vel * SPEED;
-		this.y += this.y_vel * SPEED;
-	}
+
 }
 
 export default Player;
