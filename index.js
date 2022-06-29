@@ -1,11 +1,6 @@
-﻿import { exec } from "child_process";
-exec("fuser -k 4545/tcp");
-
-
-import Player from './player.class.js';
+﻿import Player from './player.class.js';
 import Queue from './queue.class.js';
 import express from 'express';
-import moment from 'moment';
 const app = express();
 import http from 'http';
 const server = http.createServer(app);
@@ -24,7 +19,7 @@ const deltaTime = (previous, offset) => {
 }
 
 app.get('/', (req, res) => {
-  res.send("Hello");
+  res.send("👀");
 });
 
 /* 
@@ -57,21 +52,22 @@ setInterval(() => {
     const getActions = updateQueue.items.filter(item => item.user === user.socketid)
     if (!getActions) return;
     getActions.forEach((action, index) => {
+      let calc = Math.round( (action.action.delta / 256) * 50)
       if (action.action.move) {
         if (action.action.move.dir === "right") {
-          user.x += Math.round(Math.ceil((1 * 0.2) * action.action.delta))
+          user.x += calc
           updateQueue.dequeue(index)
         }
         if (action.action.move.dir === "left") {
-          user.x -= Math.round(Math.ceil((1 * 0.2) * action.action.delta))
+          user.x -= calc
           updateQueue.dequeue(index)
         }
         if (action.action.move.dir === "up") {
-          user.y -= Math.round(Math.ceil((1 * 0.2) * action.action.delta))
+          user.y -= calc
           updateQueue.dequeue(index)
         }
         if (action.action.move.dir === "down") {
-          user.y += Math.round(Math.ceil((1 * 0.2) * action.action.delta))
+          user.y += calc
           updateQueue.dequeue(index)
         }
       }
@@ -81,18 +77,12 @@ setInterval(() => {
 
 io.on('connection', (socket) => {
   const player = new Player('', socket.id)
-  player.x = 1539;
-  player.y = 2076
+  player.x = 1064;
+  player.y = 1534
   users.push(player);
 
-  socket.on('latency_check', (data)=>{
-    const now = moment();
-    const end = moment(data)
-    //console.log(now)
-    const timeTaken = moment.duration(end.diff(now));
-    console.log(timeTaken.asMilliseconds())
-    socket.emit('latency_response', timeTaken.asMilliseconds());
-
+  socket.on('latency_check', ()=>{
+     socket.emit('latency_response');
   })
 
   socket.on('move', (dir, delta, previousPos, time) => {
@@ -127,24 +117,23 @@ io.on('connection', (socket) => {
   })
 });
 
-server.listen(4545, () => {
-  console.log('listening on *:3000');
-});
+
 
 const yeetServer = () => {
-  setTimeout(()=>{
     console.log('Shutting Down!');
     server.close();
-    process.kill(process.pid, 'SIGUSR2');
-},100);
+    process.kill(process.pid);
 }
-process.once('SIGUSR2', async function() {
-  await yeetServer()
+process.once('SIGUSR1', () => {
+  yeetServer();
+});
+process.once('SIGUSR2', () => {
+  yeetServer()
+});
+process.once('SIGINT', () => {
+  yeetServer();
 });
 
-process.once('SIGINT', async function () {
-  await yeetServer();
-});
-process.once('SIGUSR1', async function () {
-  await yeetServer();
+server.listen(4545, () => {
+  console.log('listening on *:4545');
 });
